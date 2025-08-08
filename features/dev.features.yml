@@ -1,0 +1,130 @@
+version: "1.4"
+namespace:
+  key: vi2-dev
+  name: vi2-dev
+
+flags:
+  - key: preset
+    name: preset
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: PASSENGER
+        attachment: [PASSENGER]
+        default: true
+      - key: VANS
+        attachment: [VANS]
+      - key: LOWER_BUMPER
+        attachment: [LOWER_BUMPER]
+      - key: LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+        attachment: [LOWER_BUMPER_ONLY_PHYSICAL_PARTS]
+    rules:
+      - segment: PRESET_VANS
+        distributions:
+          - variant: VANS
+            rollout: 100
+      - segment: PRESET_LOWER_BUMPER
+        distributions:
+          - variant: LOWER_BUMPER
+            rollout: 100
+      - segment: PRESET_LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+        distributions:
+          - variant: LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+            rollout: 100
+  - key: subtract_masks_subparts
+    name: subtract_masks_subparts
+    type: BOOLEAN_FLAG_TYPE
+    enabled: false
+    rollouts:
+      - segment:
+          key: PRESET_VANS
+          value: true
+  - key: deterministic_probability
+    name: deterministic_probability
+    type: BOOLEAN_FLAG_TYPE
+    enabled: true
+  - key: use_mask_for_main_part_overlap
+    name: use_mask_for_main_part_overlap
+    type: BOOLEAN_FLAG_TYPE
+    enabled: false
+  - key: sgns_from_second_cc
+    name: sgns_from_second_cc
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: DEFAULT
+        attachment: [[]]
+        default: true
+      - key: SECOND_CC
+        attachment: [["6320002", "6320507"]]
+    rules:
+      - segment: PRESET_LOWER_BUMPER
+        distributions:
+          - variant: SECOND_CC
+            rollout: 100
+      - segment: PRESET_LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+        distributions:
+          - variant: SECOND_CC
+            rollout: 100
+  - key: model_tl
+    name: model_tl
+    type: VARIANT_FLAG_TYPE
+    enabled: true
+    variants:
+      - key: DEFAULT
+        attachment: ["total-loss-classifier"]
+        default: true
+      - key: EXPERIMENTAL
+        attachment: ["experimental-total-loss-classifier"]
+  - key: map_cc_sides
+    name: map_cc_sides
+    type: BOOLEAN_FLAG_TYPE
+    enabled: false
+    rollouts:
+      - segment:
+          key: PRESET_VANS
+          value: true
+      - segment:
+          key: PRESET_LOWER_BUMPER
+          value: true
+      - segment:
+          key: PRESET_LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+          value: true
+  - key: apply_lb_logic_to_aggregated_results
+    name: apply_lb_logic_to_aggregated_results
+    type: BOOLEAN_FLAG_TYPE
+    enabled: false
+    rollouts:
+      - segment:
+          key: PRESET_LOWER_BUMPER
+          value: true
+
+segments:
+  - key: PRESET_PASSENGER
+    name: PRESET_PASSENGER
+    match_type: ALL_MATCH_TYPE
+  - key: PRESET_VANS
+    name: PRESET_VANS
+    constraints:
+      - type: STRING_COMPARISON_TYPE
+        property: preset
+        operator: eq
+        value: VANS
+    match_type: ALL_MATCH_TYPE
+  - key: PRESET_LOWER_BUMPER
+    name: PRESET_LOWER_BUMPER
+    constraints:
+      - type: STRING_COMPARISON_TYPE
+        property: preset
+        operator: eq
+        value: LOWER_BUMPER
+    match_type: ALL_MATCH_TYPE
+  - key: PRESET_LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+    name: PRESET_LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+    constraints:
+      - type: STRING_COMPARISON_TYPE
+        property: preset
+        operator: eq
+        value: LOWER_BUMPER_ONLY_PHYSICAL_PARTS
+    match_type: ALL_MATCH_TYPE
+
