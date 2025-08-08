@@ -1,0 +1,11 @@
+services:
+  flipt-git:
+    image: flipt/flipt:v1.56.0
+    ports:
+      - 8080:8080
+    volumes:
+      - ../features:/var/opt/flipt/features
+    environment:
+      - FLIPT_STORAGE_TYPE=local
+      - FLIPT_STORAGE_LOCAL_PATH=/var/opt/flipt/features
+
